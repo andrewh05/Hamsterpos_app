@@ -1,0 +1,27 @@
+name: pos
+description: Mobile POS App
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  mysql_client: ^0.0.27
+
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+      
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/

@@ -163,7 +163,7 @@ class WavePainter extends CustomPainter {
         for (double y = size.height; y >= 0; y -= 5) {
           // A nice organic wave function
           // x is calculated based on y
-           final x = size.width - (size.width * 0.4) 
+           final x = size.width - (size.width * 0.15) // Changed from 0.4 to 0.15
               + math.sin((y / size.height * 4 * math.pi) + (shift * 2 * math.pi) + i) * waveHeight
               + (i * 30);
               
@@ -179,7 +179,7 @@ class WavePainter extends CustomPainter {
         path.lineTo(0, size.height);
         
         for (double y = size.height; y >= 0; y -= 5) {
-           final x = (size.width * 0.3) 
+           final x = (size.width * 0.1) // Changed from 0.3 to 0.1
               + math.sin((y / size.height * 3 * math.pi) + (shift * 2 * math.pi) + i) * waveHeight
               - (i * 30);
               

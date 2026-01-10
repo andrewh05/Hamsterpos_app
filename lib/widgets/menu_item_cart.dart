@@ -85,9 +85,9 @@ class _MenuItemCardState extends State<MenuItemCard>
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            const Color(0xFF6366F1)
+                            Theme.of(context).primaryColor
                                 .withOpacity(_isPressed ? 0.2 : 0.1),
-                            const Color(0xFF8B5CF6)
+                            Theme.of(context).colorScheme.secondary
                                 .withOpacity(_isPressed ? 0.2 : 0.1),
                           ],
                           begin: Alignment.topLeft,
@@ -170,9 +170,9 @@ class _MenuItemCardState extends State<MenuItemCard>
                     children: [
                       Text(
                         '\$${widget.item.price.toStringAsFixed(2)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
-                          color: Color(0xFF6366F1),
+                          color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -180,13 +180,11 @@ class _MenuItemCardState extends State<MenuItemCard>
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-                          ),
+                          color: Theme.of(context).primaryColor,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF6366F1).withOpacity(0.3),
+                              color: Theme.of(context).primaryColor.withOpacity(0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),

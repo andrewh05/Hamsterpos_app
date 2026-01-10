@@ -34,13 +34,13 @@ class WaiterPOSApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6366F1),
-          primary: const Color(0xFF6366F1),
-          secondary: const Color(0xFF8B5CF6),
-          background: const Color(0xFFF8F9FA),
+          seedColor: const Color(0xFFB2D6FF), // Soft Blue from waves
+          primary: const Color(0xFFB2D6FF),
+          secondary: const Color(0xFFFFE1C6), // Warm Orange from waves
           surface: Colors.white,
+          background: const Color(0xFFF8FAFF), // Soft Cool White
         ),
-        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
+        scaffoldBackgroundColor: const Color(0xFFF8FAFF),
         fontFamily: 'SF Pro Display',
         appBarTheme: const AppBarTheme(
           elevation: 0,
@@ -59,8 +59,8 @@ class WaiterPOSApp extends StatelessWidget {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             elevation: 0,
-            backgroundColor: const Color(0xFF6366F1),
-            foregroundColor: Colors.white,
+            backgroundColor: const Color(0xFFB2D6FF), // Soft Blue
+            foregroundColor: Colors.black87, // Dark text for contrast
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -79,7 +79,7 @@ class WaiterPOSApp extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+            borderSide: const BorderSide(color: Color(0xFFB2D6FF), width: 2), // Soft Blue focus
           ),
         ),
       ),

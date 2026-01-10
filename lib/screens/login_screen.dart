@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'table_selection_screen.dart';
+import '../services/database_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -10,8 +11,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String enteredPin = '';
-  final String correctPin = '1234'; // Default PIN
   bool isError = false;
+  bool isValidating = false;
 
   void onNumberPressed(String number) {
     if (enteredPin.length < 4) {
@@ -35,9 +36,22 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _checkPin() {
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (enteredPin == correctPin) {
+  void _checkPin() async {
+    setState(() {
+      isValidating = true;
+    });
+
+    try {
+      // Validate PIN against database
+      final isValid = await DatabaseService.validateUserPin(enteredPin);
+      
+      if (!mounted) return;
+      
+      setState(() {
+        isValidating = false;
+      });
+
+      if (isValid) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -49,13 +63,43 @@ class _LoginScreenState extends State<LoginScreen> {
           isError = true;
         });
         Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            setState(() {
+              enteredPin = '';
+              isError = false;
+            });
+          }
+        });
+      }
+    } catch (e) {
+      // Handle database errors
+      if (!mounted) return;
+      
+      setState(() {
+        isValidating = false;
+        isError = true;
+      });
+      
+      print('Login error: $e');
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Database error: $e'),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
           setState(() {
             enteredPin = '';
             isError = false;
           });
-        });
-      }
-    });
+        }
+      });
+    }
   }
 
   Widget _buildNumberButton(String number) {
@@ -119,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Icon(
               icon,
               size: 28,
-              color: color ?? const Color(0xFF6366F1),
+              color: color ?? Theme.of(context).primaryColor, // Use theme primary
             ),
           ),
         ),
@@ -129,6 +173,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildPinDot(int index) {
     bool isFilled = index < enteredPin.length;
+    final primaryColor = Theme.of(context).primaryColor;
+    
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: 20,
@@ -138,13 +184,13 @@ class _LoginScreenState extends State<LoginScreen> {
         color: isError
             ? const Color(0xFFEF4444)
             : isFilled
-                ? const Color(0xFF6366F1)
+                ? primaryColor
                 : Colors.transparent,
         border: Border.all(
           color: isError
               ? const Color(0xFFEF4444)
               : isFilled
-                  ? const Color(0xFF6366F1)
+                  ? primaryColor
                   : const Color(0xFFD1D5DB),
           width: 2,
         ),
@@ -154,8 +200,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: colorScheme.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -170,15 +218,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        color: colorScheme.primary,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF6366F1).withOpacity(0.3),
+                            color: colorScheme.primary.withOpacity(0.3),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -265,26 +309,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6366F1).withOpacity(0.1),
+                        color: colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: const Color(0xFF6366F1).withOpacity(0.2),
+                          color: colorScheme.primary.withOpacity(0.2),
                         ),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.info_outline,
-                            color: Color(0xFF6366F1),
+                            color: colorScheme.primary, // Using primary color (Soft Blue)
                             size: 20,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Default PIN: 1234',
+                              'Enter PIN from database',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: const Color(0xFF6366F1),
+                                color: const Color(0xFF1A1A1A), // Dark text for readability on soft bg
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

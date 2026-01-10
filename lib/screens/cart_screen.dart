@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import '../models/cart_item.dart';
 import '../models/dining_table.dart';
 import '../services/table_service.dart';
+import '../services/database_service.dart';
 
 class CartScreen extends StatefulWidget {
   final List<CartItem> cart;
   final DiningTable? selectedTable;
+  final String? cartId;
 
-  const CartScreen({Key? key, required this.cart, this.selectedTable})
-      : super(key: key);
+  const CartScreen({
+    Key? key,
+    required this.cart,
+    this.selectedTable,
+    this.cartId,
+  }) : super(key: key);
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -35,16 +41,25 @@ class _CartScreenState extends State<CartScreen> {
     return widget.cart.fold(0, (sum, item) => sum + item.totalPrice);
   }
 
-  void updateQuantity(int index, int delta) {
+  void updateQuantity(int index, int delta) async {
     setState(() {
       widget.cart[index].quantity += delta;
       if (widget.cart[index].quantity <= 0) {
+        // Delete from database if cartId exists
+        if (widget.cartId != null) {
+          DatabaseService.deleteCartLine(widget.cartId!, index);
+        }
         widget.cart.removeAt(index);
       }
     });
   }
 
-  void removeItem(int index) {
+  void removeItem(int index) async {
+    // Delete from database if cartId exists
+    if (widget.cartId != null) {
+      await DatabaseService.deleteCartLine(widget.cartId!, index);
+    }
+    
     setState(() {
       widget.cart.removeAt(index);
     });
@@ -97,9 +112,7 @@ class _CartScreenState extends State<CartScreen> {
         actions: [
           Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-              ),
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Material(
@@ -360,13 +373,13 @@ class _CartScreenState extends State<CartScreen> {
                                       Container(
                                         padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF6366F1)
+                                          color: Theme.of(context).primaryColor
                                               .withOpacity(0.12),
                                           shape: BoxShape.circle,
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.table_bar_rounded,
-                                          color: Color(0xFF6366F1),
+                                          color: Theme.of(context).primaryColor,
                                         ),
                                       ),
                                       const SizedBox(width: 14),
@@ -417,9 +430,9 @@ class _CartScreenState extends State<CartScreen> {
                                         horizontal: 20,
                                         vertical: 16,
                                       ),
-                                      prefixIcon: const Icon(
+                                      prefixIcon: Icon(
                                         Icons.table_bar_rounded,
-                                        color: Color(0xFF6366F1),
+                                        color: Theme.of(context).primaryColor,
                                       ),
                                     ),
                                     keyboardType: TextInputType.number,

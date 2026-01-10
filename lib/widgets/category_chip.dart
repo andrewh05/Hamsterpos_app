@@ -26,19 +26,12 @@ class CategoryChip extends StatelessWidget {
             curve: Curves.easeInOut,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-              gradient: isSelected
-                  ? const LinearGradient(
-                      colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : null,
-              color: isSelected ? null : const Color(0xFFF3F4F6),
+              color: isSelected ? Theme.of(context).primaryColor : const Color(0xFFF3F4F6),
               borderRadius: BorderRadius.circular(24),
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: const Color(0xFF6366F1).withOpacity(0.3),
+                        color: Theme.of(context).primaryColor.withOpacity(0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),

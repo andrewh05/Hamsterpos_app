@@ -12,6 +12,8 @@ import 'table_selection_screen.dart';
 import '../services/table_service.dart';
 import '../services/shared_ticket_service.dart';
 import '../services/database_service.dart';
+import 'database_settings_screen.dart';
+import 'config_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final DiningTable selectedTable;
@@ -67,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Loaded existing order for ${widget.selectedTable.name}'),
-              backgroundColor: const Color(0xFF6366F1),
+              backgroundColor: Theme.of(context).primaryColor,
               duration: const Duration(seconds: 2),
             ),
           );
@@ -529,8 +531,8 @@ class _HomeScreenState extends State<HomeScreen> {
            await DatabaseService.unlockTable(widget.selectedTable.id);
         }
       },
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
+            child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -580,109 +582,57 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF6366F1).withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
               icon:
-                  const Icon(Icons.settings_outlined, color: Color(0xFF6366F1)),
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Row(
-                      children: [
-                        Icon(Icons.info_outline, color: Colors.white),
-                        SizedBox(width: 12),
-                        Text(
-                          'Settings coming soon!',
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                    backgroundColor: const Color(0xFF6366F1),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    margin: const EdgeInsets.all(16),
-                    duration: const Duration(milliseconds: 2000),
-                  ),
-                );
-              },
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(right: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEF4444).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.logout_rounded, color: Color(0xFFEF4444)),
+                  Icon(Icons.settings_outlined, color: Theme.of(context).primaryColor),
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    title: const Row(
-                      children: [
-                        Icon(Icons.logout_rounded, color: Color(0xFFEF4444)),
-                        SizedBox(width: 12),
-                        Text('Logout'),
-                      ],
-                    ),
-                    content: const Text(
-                      'Are you sure you want to logout?',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(color: Color(0xFF6B7280)),
-                        ),
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
+                      title: Row(
+                        children: [
+                          Icon(Icons.settings_rounded, 
+                            color: Theme.of(context).primaryColor),
+                          const SizedBox(width: 12),
+                          const Text('Settings'),
+                        ],
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Database Settings Option
+                          ListTile(
+                            leading: const Icon(Icons.storage_rounded, 
+                              color: Color(0xFF6366F1)),
+                            title: const Text('Database Settings'),
+                            subtitle: const Text('Configure database connection'),
                             onTap: () {
-                              Navigator.pushAndRemoveUntil(
+                              Navigator.pop(context);
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const LoginScreen(),
+                                  builder: (context) => const DatabaseSettingsScreen(),
                                 ),
-                                (route) => false,
                               );
                             },
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                              child: const Text(
-                                'Logout',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
             ),
@@ -717,12 +667,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF6366F1).withOpacity(0.1),
+                              color: Theme.of(context).primaryColor.withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.table_bar_rounded,
-                              color: Color(0xFF6366F1),
+                              color: Theme.of(context).primaryColor,
                               size: 22,
                             ),
                           ),
@@ -812,15 +762,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: double.infinity,
                     width: 56,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: Theme.of(context).primaryColor,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF6366F1).withOpacity(0.35),
+                          color: Theme.of(context).primaryColor.withOpacity(0.35),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -939,9 +885,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Expanded(
             child: _loading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(Color(0xFF6366F1)),
+                      valueColor: AlwaysStoppedAnimation(Theme.of(context).primaryColor),
                     ),
                   )
                 : _error != null
@@ -1306,29 +1252,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
-                          gradient: cart.isEmpty
-                              ? LinearGradient(
-                                  colors: [
-                                    const Color(0xFF6366F1).withOpacity(0.5),
-                                    const Color(0xFF4F46E5).withOpacity(0.5),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                )
-                              : const LinearGradient(
-                                  colors: [
-                                    Color(0xFF6366F1),
-                                    Color(0xFF4F46E5)
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
+                          color: cart.isEmpty
+                              ? Theme.of(context).primaryColor.withOpacity(0.5)
+                              : Theme.of(context).primaryColor,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: cart.isEmpty
                               ? []
                               : [
                                   BoxShadow(
-                                    color: const Color(0xFF6366F1)
+                                    color: Theme.of(context).primaryColor
                                         .withOpacity(0.4),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
@@ -1347,14 +1279,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                         builder: (context) => CartScreen(
                                           cart: cart,
                                           selectedTable: widget.selectedTable,
+                                          cartId: _ticketId,
                                         ),
                                       ),
                                     );
-                                    if (result == true) {
-                                      setState(() {
+                                    // Always update UI when returning from cart
+                                    setState(() {
+                                      if (result == true) {
+                                        // Order was placed, clear cart
                                         cart.clear();
-                                      });
-                                    }
+                                      }
+                                      // If result is null/false, cart may have been modified
+                                      // setState will refresh the counters
+                                    });
                                   },
                             borderRadius: BorderRadius.circular(16),
                             child: Container(

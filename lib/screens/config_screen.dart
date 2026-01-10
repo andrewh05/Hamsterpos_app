@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/database_service.dart';
+import 'database_settings_screen.dart';
 import 'splash_screen.dart';
 
 class ConfigScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
   List<String> _databases = [];
   String? _selectedDatabase;
   bool _isLoading = false;
+  bool _isSaving = false;
   String? _errorMessage;
 
   @override
@@ -80,36 +82,91 @@ class _ConfigScreenState extends State<ConfigScreen> {
     }
   }
 
-  Future<void> _selectDatabase() async {
+  Future<void> _saveConfig() async {
     if (_selectedDatabase == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a database')),
+        const SnackBar(
+          content: Text('Please select a database first'),
+          backgroundColor: Color(0xFFEF4444),
+        ),
       );
       return;
     }
 
+    setState(() {
+      _isSaving = true;
+    });
+
     try {
-      // Save configuration to shared preferences
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('server_ip', _serverIpController.text.trim());
+      await prefs.setString('server_ip', _serverIpController.text.trim()); // Changed from _serverController
       await prefs.setString('server_port', _portController.text.trim());
-      await prefs.setString('mysql_user', _usernameController.text.trim());
+      await prefs.setString('mysql_user', _usernameController.text.trim()); // Changed from _userController
       await prefs.setString('mysql_password', _passwordController.text);
       await prefs.setString('selected_database', _selectedDatabase!);
-      await prefs.setBool('config_completed', true);
+      await prefs.setBool('config_completed', true); // Added this line to ensure config_completed is set
 
-      // Close the connection
+      if (!mounted) return;
+
+      // Test connection after saving
+      final isConnected = await DatabaseService.testConnection(
+        host: _serverIpController.text.trim(), // Changed from _serverController
+        port: int.tryParse(_portController.text.trim()) ?? 3306,
+        user: _usernameController.text.trim(), // Changed from _userController
+        password: _passwordController.text,
+      );
+
+      // Close the connection after testing
       await DatabaseService.closeConnection();
 
-      // Navigate to splash screen
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SplashScreen()),
-      );
+
+      setState(() {
+        _isSaving = false;
+      });
+
+      if (isConnected) {
+        // Connection successful - navigate to splash screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Configuration saved and connection successful!'),
+            backgroundColor: Color(0xFF10B981),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Navigate to splash screen after a short delay
+        await Future.delayed(const Duration(milliseconds: 500));
+        
+        if (!mounted) return;
+        
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const SplashScreen()),
+          (route) => false,
+        );
+      } else {
+        // Connection failed but config saved
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Configuration saved but connection failed. Please check your settings.'),
+            backgroundColor: Color(0xFFEF4444),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
     } catch (e) {
+      if (!mounted) return;
+      
+      setState(() {
+        _isSaving = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving configuration: $e')),
+        SnackBar(
+          content: Text('Error saving configuration: $e'),
+          backgroundColor: const Color(0xFFEF4444),
+        ),
       );
     }
   }
@@ -118,12 +175,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
         ),
         child: SingleChildScrollView(
           child: Padding(
@@ -298,8 +351,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
                       onPressed: _isLoading ? null : _connectToServer,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF6366F1),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        foregroundColor: Theme.of(context).primaryColor,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -311,12 +364,10 @@ class _ConfigScreenState extends State<ConfigScreen> {
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation(Color(0xFF6366F1)),
                               ),
                             )
                           : const Text(
-                              'Connect',
+                              'Connect to Server',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -358,7 +409,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
                               color: Colors.white.withOpacity(0.6),
                             ),
                           ),
-                          dropdownColor: const Color(0xFF4F46E5),
+                          dropdownColor: Theme.of(context).colorScheme.secondary,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -382,19 +433,27 @@ class _ConfigScreenState extends State<ConfigScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _selectDatabase,
+                      onPressed: _isSaving ? null : _saveConfig,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF6366F1),
+                        foregroundColor: Theme.of(context).primaryColor,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Continue',
-                        style: TextStyle(
-                          fontSize: 16,
+                      child: _isSaving
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Save Configuration',
+                              style: TextStyle(
+                                fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

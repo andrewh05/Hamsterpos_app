@@ -175,7 +175,9 @@ class DatabaseService {
     MySQLConnection? conn;
 
     try {
+      print('🔌 Testing connection to $host:$port...');
       await probeReachability(host: host, port: port);
+      print('✅ Reachability check passed');
 
       conn = await _createConnection(
         host: host,
@@ -185,12 +187,15 @@ class DatabaseService {
       );
 
       await conn.connect();
+      print('✅ Connection established');
 
       // Perform a simple query to verify the connection works
       await conn.execute('SELECT 1');
+      print('✅ Test query successful');
 
       return true;
     } catch (e) {
+      print('❌ Connection test failed: $e');
       return false;
     } finally {
       if (conn != null) {
@@ -264,6 +269,19 @@ class DatabaseService {
       String esc(String s) => s.replaceAll("'", "\\'");
       await conn
           .execute("DELETE FROM ticketlines WHERE TICKET='${esc(ticketId)}'");
+    } finally {
+      await conn.close();
+    }
+  }
+
+  /// Delete a specific ticket line by line number
+  static Future<void> deleteTicketLine(String ticketId, int lineNumber) async {
+    final conn = await openConfiguredConnection();
+    try {
+      String esc(String s) => s.replaceAll("'", "\\'");
+      await conn.execute(
+          "DELETE FROM ticketlines WHERE TICKET='${esc(ticketId)}' AND LINE=$lineNumber");
+      print('🗑️ Deleted ticket line: ticketId=$ticketId, line=$lineNumber');
     } finally {
       await conn.close();
     }
@@ -376,6 +394,40 @@ class DatabaseService {
       return null;
     } finally {
       await conn.close();
+    }
+  }
+
+  /// Validate user PIN from the people table
+  /// Returns true if the entered PIN matches any user's app_pin
+  static Future<bool> validateUserPin(String enteredPin) async {
+    try {
+      print('🔐 Validating PIN: $enteredPin');
+      final conn = await openConfiguredConnection();
+      try {
+        // Check if the entered PIN matches any user's app_pin
+        String esc(String s) => s.replaceAll("'", "\\'");
+        final result = await conn.execute(
+          "SELECT id, name FROM people WHERE app_pin='${esc(enteredPin)}' LIMIT 1"
+        );
+        
+        print('📊 Query result: ${result.rows.length} rows found');
+        
+        if (result.rows.isEmpty) {
+          print('❌ No user found with PIN: $enteredPin');
+          return false;
+        }
+        
+        final userId = result.rows.first.colAt(0);
+        final userName = result.rows.first.colAt(1);
+        print('✅ PIN matched! User: $userName (ID: $userId)');
+        return true;
+      } finally {
+        await conn.close();
+      }
+    } catch (e) {
+      // If database error occurs, return false
+      print('❌ Error validating PIN: $e');
+      return false;
     }
   }
 
@@ -824,7 +876,34 @@ class DatabaseService {
           c.updated_date = '$now'
         WHERE c.id = '${esc(cartId)}'
       """);
+    } finally {
+      await conn.close();
+    }
+  }
 
+  /// Delete a specific cart line by line number
+  static Future<void> deleteCartLine(String cartId, int lineNumber) async {
+    final conn = await openConfiguredConnection();
+    try {
+      String esc(String s) => s.replaceAll("'", "\\'");
+      
+      // Delete the specific line
+      await conn.execute(
+          "DELETE FROM cartlines WHERE cart_id='${esc(cartId)}' AND line_number=$lineNumber");
+      
+      print('🗑️ Deleted cart line: cartId=$cartId, line=$lineNumber');
+      
+      // Update cart totals after deletion
+      final now = DateTime.now().toIso8601String().split('.')[0].replaceAll('T', ' ');
+      await conn.execute("""
+        UPDATE cart c 
+        SET 
+          c.subtotal = (SELECT COALESCE(SUM(cl.subtotal), 0) FROM cartlines cl WHERE cl.cart_id = c.id),
+          c.tax = (SELECT COALESCE(SUM(cl.tax_amount), 0) FROM cartlines cl WHERE cl.cart_id = c.id),
+          c.total = (SELECT COALESCE(SUM(cl.total), 0) FROM cartlines cl WHERE cl.cart_id = c.id),
+          c.updated_date = '$now'
+        WHERE c.id = '${esc(cartId)}'
+      """);
     } finally {
       await conn.close();
     }
@@ -837,7 +916,7 @@ class DatabaseService {
       String esc(String s) => s.replaceAll("'", "\\'");
 
       final result = await conn.execute("""
-        SELECT 
+        SELECT
           cl.line_number,
           cl.product_id,
           cl.product_name,

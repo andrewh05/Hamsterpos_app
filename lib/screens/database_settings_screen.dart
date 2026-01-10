@@ -173,22 +173,22 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6366F1).withOpacity(0.1),
+                        color: Theme.of(context).primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: const Color(0xFF6366F1).withOpacity(0.3),
+                          color: Theme.of(context).primaryColor.withOpacity(0.3),
                         ),
                       ),
                       child: Row(
                         children: [
                           Icon(Icons.info_outline,
-                              color: const Color(0xFF6366F1), size: 22),
+                              color: Theme.of(context).primaryColor, size: 22),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               'Configure your MySQL database connection',
                               style: TextStyle(
-                                color: const Color(0xFF6366F1),
+                                color: Theme.of(context).primaryColor,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -295,7 +295,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                           : const Icon(Icons.wifi_find_rounded),
                       label: Text(_testing ? 'Testing...' : 'Test Connection'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6366F1),
+                        backgroundColor: Theme.of(context).primaryColor,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -367,7 +367,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(color: Colors.grey[400]),
-              prefixIcon: Icon(icon, color: const Color(0xFF6366F1), size: 22),
+              prefixIcon: Icon(icon, color: Theme.of(context).primaryColor, size: 22),
               suffixIcon: suffixIcon,
               border: InputBorder.none,
               contentPadding:

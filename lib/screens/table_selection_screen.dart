@@ -4,6 +4,7 @@ import '../models/dining_table.dart';
 import '../services/table_service.dart';
 import 'home_screen.dart' as home;
 import 'database_settings_screen.dart';
+import 'login_screen.dart';
 
 class TableSelectionScreen extends StatefulWidget {
   final bool returnSelection; // when true, pop with selected table
@@ -240,13 +241,13 @@ class _TableSelectionScreenState extends State<TableSelectionScreen> {
                 _selectedTable = null;
               });
             },
-            selectedColor: const Color(0xFF6366F1),
+            selectedColor: Theme.of(context).primaryColor,
             backgroundColor: const Color(0xFFF3F4F6),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
                 color: selected
-                    ? const Color(0xFF6366F1)
+                    ? Theme.of(context).primaryColor
                     : const Color(0xFFE5E7EB),
               ),
             ),
@@ -266,7 +267,7 @@ class _TableSelectionScreenState extends State<TableSelectionScreen> {
         color: isSelected ? const Color(0xFFEEF2FF) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isSelected ? const Color(0xFF6366F1) : const Color(0xFFE5E7EB),
+          color: isSelected ? Theme.of(context).primaryColor : const Color(0xFFE5E7EB),
           width: isSelected ? 2 : 1,
         ),
         boxShadow: [
@@ -333,21 +334,21 @@ class _TableSelectionScreenState extends State<TableSelectionScreen> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6366F1).withOpacity(0.1),
+                        color: Theme.of(context).primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.chair_alt_rounded,
-                              size: 16, color: Color(0xFF6366F1)),
+                          Icon(Icons.chair_alt_rounded,
+                              size: 16, color: Theme.of(context).primaryColor),
                           const SizedBox(width: 6),
                           Text(
                             '${table.seats} seats',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF6366F1),
+                              color: Theme.of(context).primaryColor,
                             ),
                           ),
                         ],
@@ -450,13 +451,9 @@ class _TableSelectionScreenState extends State<TableSelectionScreen> {
               // Header Gradient
               Container(
                 padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(24),
                     bottomRight: Radius.circular(24),
                   ),
@@ -516,6 +513,134 @@ class _TableSelectionScreenState extends State<TableSelectionScreen> {
                               margin: const EdgeInsets.all(16),
                               duration: const Duration(milliseconds: 1500),
                             ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.logout_rounded,
+                            color: Colors.white, size: 26),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              title: const Row(
+                                children: [
+                                  Icon(Icons.logout_rounded, color: Color(0xFFEF4444)),
+                                  SizedBox(width: 12),
+                                  Text('Logout'),
+                                ],
+                              ),
+                              content: const Text(
+                                'Are you sure you want to logout?',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text(
+                                    'Cancel',
+                                    style: TextStyle(color: Color(0xFF6B7280)),
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const LoginScreen(),
+                                      ),
+                                      (route) => false,
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFEF4444),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Logout',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.settings_rounded,
+                            color: Colors.white, size: 26),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                title: Row(
+                                  children: [
+                                    Icon(Icons.settings_rounded, 
+                                      color: Theme.of(context).primaryColor),
+                                    const SizedBox(width: 12),
+                                    const Text('Settings'),
+                                  ],
+                                ),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Database Settings Option
+                                    ListTile(
+                                      leading: const Icon(Icons.storage_rounded, 
+                                        color: Color(0xFF6366F1)),
+                                      title: const Text('Database Settings'),
+                                      subtitle: const Text('Configure database connection'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const DatabaseSettingsScreen(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Close'),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
                       ),
@@ -617,13 +742,13 @@ class _TableSelectionScreenState extends State<TableSelectionScreen> {
                                   _statusFilter = chip['value'];
                                 });
                               },
-                              selectedColor: const Color(0xFF6366F1),
+                              selectedColor: Theme.of(context).primaryColor,
                               backgroundColor: const Color(0xFFF3F4F6),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 side: BorderSide(
                                   color: selected
-                                      ? const Color(0xFF6366F1)
+                                      ? Theme.of(context).primaryColor
                                       : const Color(0xFFE5E7EB),
                                 ),
                               ),

@@ -5,6 +5,7 @@ import 'login_screen.dart';
 import 'connection_error_screen.dart';
 import '../services/database_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/responsive_utils.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -184,22 +185,51 @@ class _SplashScreenState extends State<SplashScreen>
                   children: [
                     Image.asset(
                       'assets/logo.jpeg', // Using existing logo
-                      width: 160,
+                      width: ResponsiveUtils.getResponsiveValue(
+                        context,
+                        mobile: 140.0,
+                        tablet: 200.0,
+                        desktop: 240.0,
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveSpacing(
+                        context,
+                        mobile: 20.0,
+                        tablet: 28.0,
+                        desktop: 32.0,
+                      ),
+                    ),
+                    Text(
                       'Always think BIGGER',
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: ResponsiveUtils.getResponsiveFontSize(
+                          context,
+                          mobile: 22.0,
+                          tablet: 28.0,
+                          desktop: 32.0,
+                        ),
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveSpacing(
+                        context,
+                        mobile: 12.0,
+                        tablet: 16.0,
+                        desktop: 20.0,
+                      ),
+                    ),
+                    Text(
                       'Hamster POS 2015 - 2026 ©',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: ResponsiveUtils.getResponsiveFontSize(
+                          context,
+                          mobile: 14.0,
+                          tablet: 16.0,
+                          desktop: 18.0,
+                        ),
                         color: Colors.black45,
                       ),
                     ),

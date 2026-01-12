@@ -14,6 +14,7 @@ import '../services/shared_ticket_service.dart';
 import '../services/database_service.dart';
 import 'database_settings_screen.dart';
 import 'config_screen.dart';
+import '../utils/responsive_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   final DiningTable selectedTable;
@@ -928,15 +929,28 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       )
                     : Builder(builder: (context) {
-                        if (selectedCategoryId == 'all') {
+                          if (selectedCategoryId == 'all') {
                           return GridView.builder(
                             padding: const EdgeInsets.all(20),
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: ResponsiveUtils.getGridColumns(
+                                context,
+                                mobile: 2,
+                                tablet: 3,
+                                desktop: 4,
+                              ),
                               childAspectRatio: 0.72,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
+                              crossAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+                                context,
+                                mobile: 16.0,
+                                tablet: 20.0,
+                              ),
+                              mainAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+                                context,
+                                mobile: 16.0,
+                                tablet: 20.0,
+                              ),
                             ),
                             itemCount: filteredItems.length,
                             itemBuilder: (context, index) {
@@ -994,10 +1008,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                       physics:
                                           const NeverScrollableScrollPhysics(),
                                       gridDelegate:
-                                          const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 3,
-                                        mainAxisSpacing: 12,
-                                        crossAxisSpacing: 12,
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: ResponsiveUtils.getGridColumns(
+                                          context,
+                                          mobile: 3,
+                                          tablet: 4,
+                                          desktop: 5,
+                                        ),
+                                        mainAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+                                          context,
+                                          mobile: 12.0,
+                                          tablet: 16.0,
+                                        ),
+                                        crossAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+                                          context,
+                                          mobile: 12.0,
+                                          tablet: 16.0,
+                                        ),
                                         childAspectRatio: 0.9,
                                       ),
                                       itemCount: subCategoriesForActive.length,
@@ -1098,11 +1125,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                       physics:
                                           const NeverScrollableScrollPhysics(),
                                       gridDelegate:
-                                          const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: ResponsiveUtils.getGridColumns(
+                                          context,
+                                          mobile: 2,
+                                          tablet: 3,
+                                          desktop: 4,
+                                        ),
                                         childAspectRatio: 0.72,
-                                        crossAxisSpacing: 16,
-                                        mainAxisSpacing: 16,
+                                        crossAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+                                          context,
+                                          mobile: 16.0,
+                                          tablet: 20.0,
+                                        ),
+                                        mainAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+                                          context,
+                                          mobile: 16.0,
+                                          tablet: 20.0,
+                                        ),
                                       ),
                                       itemCount: mainCategoryItems.length,
                                       itemBuilder: (context, index) {
@@ -1187,11 +1227,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                   : GridView.builder(
                                       padding: const EdgeInsets.all(20),
                                       gridDelegate:
-                                          const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: ResponsiveUtils.getGridColumns(
+                                          context,
+                                          mobile: 2,
+                                          tablet: 3,
+                                          desktop: 4,
+                                        ),
                                         childAspectRatio: 0.72,
-                                        crossAxisSpacing: 16,
-                                        mainAxisSpacing: 16,
+                                        crossAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+                                          context,
+                                          mobile: 16.0,
+                                          tablet: 20.0,
+                                        ),
+                                        mainAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+                                          context,
+                                          mobile: 16.0,
+                                          tablet: 20.0,
+                                        ),
                                       ),
                                       itemCount: filteredItems.length,
                                       itemBuilder: (context, index) {

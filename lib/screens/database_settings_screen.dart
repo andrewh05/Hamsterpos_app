@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/database_service.dart';
+import 'splash_screen.dart';
+import '../utils/responsive_utils.dart';
 
 class DatabaseSettingsScreen extends StatefulWidget {
   const DatabaseSettingsScreen({Key? key}) : super(key: key);
@@ -67,7 +69,15 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
             behavior: SnackBarBehavior.floating,
           ),
         );
-        Navigator.pop(context, true);
+        
+        // Redirect to splash screen to re-check connection
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const SplashScreen()),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -163,33 +173,64 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+          : ResponsiveContainer(
+              padding: ResponsiveUtils.getResponsivePadding(
+                context,
+                mobile: 24.0,
+                tablet: 32.0,
+                desktop: 40.0,
+              ),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: ResponsiveUtils.getResponsivePadding(
+                        context,
+                        mobile: 16.0,
+                        tablet: 20.0,
+                        desktop: 24.0,
+                      ),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(
+                          ResponsiveUtils.getBorderRadius(context),
+                        ),
                         border: Border.all(
                           color: Theme.of(context).primaryColor.withOpacity(0.3),
                         ),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.info_outline,
-                              color: Theme.of(context).primaryColor, size: 22),
-                          const SizedBox(width: 12),
+                          Icon(
+                            Icons.info_outline,
+                            color: Theme.of(context).primaryColor,
+                            size: ResponsiveUtils.getResponsiveIconSize(
+                              context,
+                              mobile: 22.0,
+                              tablet: 24.0,
+                              desktop: 26.0,
+                            ),
+                          ),
+                          SizedBox(
+                            width: ResponsiveUtils.getResponsiveSpacing(
+                              context,
+                              mobile: 12.0,
+                              tablet: 16.0,
+                            ),
+                          ),
                           Expanded(
                             child: Text(
                               'Configure your MySQL database connection',
                               style: TextStyle(
                                 color: Theme.of(context).primaryColor,
-                                fontSize: 14,
+                                fontSize: ResponsiveUtils.getResponsiveFontSize(
+                                  context,
+                                  mobile: 14.0,
+                                  tablet: 16.0,
+                                ),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -197,7 +238,13 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveSpacing(
+                        context,
+                        mobile: 24.0,
+                        tablet: 32.0,
+                      ),
+                    ),
                     _buildTextField(
                       controller: _hostController,
                       label: 'Server IP Address',
@@ -321,6 +368,7 @@ class _DatabaseSettingsScreenState extends State<DatabaseSettingsScreen> {
                 ),
               ),
             ),
+      ),
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'table_selection_screen.dart';
 import '../services/database_service.dart';
+import '../utils/responsive_utils.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -106,7 +107,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(
+          ResponsiveUtils.getBorderRadius(
+            context,
+            mobile: 16.0,
+            tablet: 20.0,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -119,15 +126,26 @@ class _LoginScreenState extends State<LoginScreen> {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => onNumberPressed(number),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(
+            ResponsiveUtils.getBorderRadius(
+              context,
+              mobile: 16.0,
+              tablet: 20.0,
+            ),
+          ),
           child: Container(
             alignment: Alignment.center,
             child: Text(
               number,
-              style: const TextStyle(
-                fontSize: 28,
+              style: TextStyle(
+                fontSize: ResponsiveUtils.getResponsiveFontSize(
+                  context,
+                  mobile: 28.0,
+                  tablet: 34.0,
+                  desktop: 40.0,
+                ),
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1A1A1A),
+                color: const Color(0xFF1A1A1A),
               ),
             ),
           ),
@@ -144,7 +162,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(
+          ResponsiveUtils.getBorderRadius(
+            context,
+            mobile: 16.0,
+            tablet: 20.0,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -157,13 +181,24 @@ class _LoginScreenState extends State<LoginScreen> {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(
+            ResponsiveUtils.getBorderRadius(
+              context,
+              mobile: 16.0,
+              tablet: 20.0,
+            ),
+          ),
           child: Container(
             alignment: Alignment.center,
             child: Icon(
               icon,
-              size: 28,
-              color: color ?? Theme.of(context).primaryColor, // Use theme primary
+              size: ResponsiveUtils.getResponsiveIconSize(
+                context,
+                mobile: 28.0,
+                tablet: 34.0,
+                desktop: 40.0,
+              ),
+              color: color ?? Theme.of(context).primaryColor,
             ),
           ),
         ),
@@ -201,28 +236,87 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isTabletOrLarger = ResponsiveUtils.isTablet(context) || ResponsiveUtils.isDesktop(context);
     
     return Scaffold(
       backgroundColor: colorScheme.background,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+        child: isTabletOrLarger ? _buildTabletLayout(colorScheme) : _buildMobileLayout(colorScheme),
+      ),
+    );
+  }
+
+  // Mobile layout - vertical stacking
+  Widget _buildMobileLayout(ColorScheme colorScheme) {
+    return ResponsiveContainer(
+      padding: ResponsiveUtils.getResponsivePadding(
+        context,
+        mobile: 24.0,
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildLogoSection(colorScheme),
+                  SizedBox(height: ResponsiveUtils.getResponsiveSpacing(context, mobile: 48.0)),
+                  _buildPinSection(),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Tablet/iPad layout - side by side
+  Widget _buildTabletLayout(ColorScheme colorScheme) {
+    return Padding(
+      padding: ResponsiveUtils.getResponsivePadding(
+        context,
+        tablet: 40.0,
+        desktop: 48.0,
+      ),
+      child: Row(
+        children: [
+          // Left side - Logo and branding
+          Expanded(
+            flex: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    colorScheme.primary,
+                    colorScheme.primary.withOpacity(0.8),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.primary.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logo/Title Section
                     Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(40),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary,
+                        color: Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.3),
+                            color: Colors.black.withOpacity(0.1),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -230,120 +324,242 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: Image.asset(
                         'assets/logo.jpeg',
-                        width: 80,
-                        height: 80,
+                        width: ResponsiveUtils.getResponsiveValue(
+                          context,
+                          mobile: 100.0,
+                          tablet: 120.0,
+                          desktop: 150.0,
+                        ),
+                        height: ResponsiveUtils.getResponsiveValue(
+                          context,
+                          mobile: 100.0,
+                          tablet: 120.0,
+                          desktop: 150.0,
+                        ),
                         fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(height: 32),
-                    const Text(
+                    Text(
                       'Hamster POS',
                       style: TextStyle(
-                        fontSize: 32,
+                        fontSize: ResponsiveUtils.getResponsiveFontSize(
+                          context,
+                          mobile: 40.0,
+                          tablet: 48.0,
+                          desktop: 56.0,
+                        ),
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A1A),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Enter your PIN to continue',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 48),
-                    // PIN Dots Display
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildPinDot(0),
-                        const SizedBox(width: 16),
-                        _buildPinDot(1),
-                        const SizedBox(width: 16),
-                        _buildPinDot(2),
-                        const SizedBox(width: 16),
-                        _buildPinDot(3),
-                      ],
-                    ),
-                    if (isError) ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        'Incorrect PIN',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: const Color(0xFFEF4444),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 32),
-                    // Number Pad
-                    GridView.count(
-                      shrinkWrap: true,
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 1.2,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: [
-                        _buildNumberButton('1'),
-                        _buildNumberButton('2'),
-                        _buildNumberButton('3'),
-                        _buildNumberButton('4'),
-                        _buildNumberButton('5'),
-                        _buildNumberButton('6'),
-                        _buildNumberButton('7'),
-                        _buildNumberButton('8'),
-                        _buildNumberButton('9'),
-                        Container(), // Empty space
-                        _buildNumberButton('0'),
-                        _buildActionButton(
-                          icon: Icons.backspace_outlined,
-                          onTap: onBackspacePressed,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    // Hint text
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            color: colorScheme.primary, // Using primary color (Soft Blue)
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Enter PIN from database',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: const Color(0xFF1A1A1A), // Dark text for readability on soft bg
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 16),
+                    Text(
+                      '2015 - 2016 ©',
+                      style: TextStyle(
+                        fontSize: ResponsiveUtils.getResponsiveFontSize(
+                          context,
+                          mobile: 16.0,
+                          tablet: 18.0,
+                          desktop: 20.0,
+                        ),
+                        color: Colors.white.withOpacity(0.9),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ],
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          ),
+          SizedBox(width: ResponsiveUtils.getResponsiveSpacing(context, tablet: 40.0, desktop: 48.0)),
+          // Right side - PIN entry
+          Expanded(
+            flex: 1,
+            child: SingleChildScrollView(
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: _buildPinSection(),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  // Logo section widget
+  Widget _buildLogoSection(ColorScheme colorScheme) {
+    return Column(
+      children: [
+        Container(
+          padding: ResponsiveUtils.getResponsivePadding(
+            context,
+            mobile: 24.0,
+          ),
+          decoration: BoxDecoration(
+            color: colorScheme.primary,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.primary.withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Image.asset(
+            'assets/logo.jpeg',
+            width: 80.0,
+            height: 80.0,
+            fit: BoxFit.contain,
+          ),
+        ),
+        const SizedBox(height: 32),
+        const Text(
+          'Hamster POS',
+          style: TextStyle(
+            fontSize: 32.0,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1A1A1A),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Enter your PIN to continue',
+          style: TextStyle(
+            fontSize: 16.0,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // PIN entry section widget
+  Widget _buildPinSection() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Enter PIN',
+          style: TextStyle(
+            fontSize: ResponsiveUtils.getResponsiveFontSize(
+              context,
+              mobile: 24.0,
+              tablet: 28.0,
+              desktop: 32.0,
+            ),
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF1A1A1A),
+          ),
+        ),
+        SizedBox(
+          height: ResponsiveUtils.getResponsiveSpacing(
+            context,
+            mobile: 32.0,
+            tablet: 40.0,
+          ),
+        ),
+        // PIN Dots Display
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildPinDot(0),
+            SizedBox(
+              width: ResponsiveUtils.getResponsiveSpacing(
+                context,
+                mobile: 16.0,
+                tablet: 20.0,
+              ),
+            ),
+            _buildPinDot(1),
+            SizedBox(
+              width: ResponsiveUtils.getResponsiveSpacing(
+                context,
+                mobile: 16.0,
+                tablet: 20.0,
+              ),
+            ),
+            _buildPinDot(2),
+            SizedBox(
+              width: ResponsiveUtils.getResponsiveSpacing(
+                context,
+                mobile: 16.0,
+                tablet: 20.0,
+              ),
+            ),
+            _buildPinDot(3),
+          ],
+        ),
+        if (isError) ...[
+          SizedBox(
+            height: ResponsiveUtils.getResponsiveSpacing(
+              context,
+              mobile: 16.0,
+              tablet: 20.0,
+            ),
+          ),
+          Text(
+            'Incorrect PIN',
+            style: TextStyle(
+              fontSize: ResponsiveUtils.getResponsiveFontSize(
+                context,
+                mobile: 14.0,
+                tablet: 16.0,
+              ),
+              color: const Color(0xFFEF4444),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+        SizedBox(
+          height: ResponsiveUtils.getResponsiveSpacing(
+            context,
+            mobile: 32.0,
+            tablet: 40.0,
+            desktop: 48.0,
+          ),
+        ),
+        // Number Pad
+        GridView.count(
+          shrinkWrap: true,
+          crossAxisCount: 3,
+          crossAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+            context,
+            mobile: 16.0,
+            tablet: 20.0,
+            desktop: 24.0,
+          ),
+          mainAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+            context,
+            mobile: 16.0,
+            tablet: 20.0,
+            desktop: 24.0,
+          ),
+          childAspectRatio: 1.2,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _buildNumberButton('1'),
+            _buildNumberButton('2'),
+            _buildNumberButton('3'),
+            _buildNumberButton('4'),
+            _buildNumberButton('5'),
+            _buildNumberButton('6'),
+            _buildNumberButton('7'),
+            _buildNumberButton('8'),
+            _buildNumberButton('9'),
+            Container(), // Empty space
+            _buildNumberButton('0'),
+            _buildActionButton(
+              icon: Icons.backspace_outlined,
+              onTap: onBackspacePressed,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

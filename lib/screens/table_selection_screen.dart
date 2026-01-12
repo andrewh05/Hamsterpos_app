@@ -5,6 +5,7 @@ import '../services/table_service.dart';
 import 'home_screen.dart' as home;
 import 'database_settings_screen.dart';
 import 'login_screen.dart';
+import '../utils/responsive_utils.dart';
 
 class TableSelectionScreen extends StatefulWidget {
   final bool returnSelection; // when true, pop with selected table
@@ -790,10 +791,23 @@ class _TableSelectionScreenState extends State<TableSelectionScreen> {
                             padding:
                                 const EdgeInsets.only(bottom: 24, top: 8),
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: ResponsiveUtils.getGridColumns(
+                                context,
+                                mobile: 2,
+                                tablet: 3,
+                                desktop: 4,
+                              ),
+                              mainAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+                                context,
+                                mobile: 12.0,
+                                tablet: 16.0,
+                              ),
+                              crossAxisSpacing: ResponsiveUtils.getResponsiveSpacing(
+                                context,
+                                mobile: 12.0,
+                                tablet: 16.0,
+                              ),
                               childAspectRatio: 1,
                             ),
                             itemCount: _applyFilters(data.tables).length,
